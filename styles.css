@@ -1,0 +1,41 @@
+#screen {
+  background-color: green;
+  width: 500px;
+  height: 75px;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  font-size: 35px;
+  padding-left: 5px;
+}
+
+#formula-screen {
+  background-color: blue;
+  width: 500px;
+  height: 50px;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  font-size: 20px;
+  padding-left: 5px;
+}
+
+.number,
+.one {
+  display: flex;
+  height: 50px;
+  width: 50px;
+  font-size: 25px;
+  background-color: beige;
+  align-items: center;
+  justify-content: center;
+}
+
+.row {
+  display: flex;
+}
+
+#buttons {
+  display: flex;
+  flex-direction: row;
+}
