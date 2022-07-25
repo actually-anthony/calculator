@@ -2,19 +2,14 @@ let firstNumber;
 let secondNumber;
 let first = true;
 
+let activeNum;
+let symbol;
+mathEnabled = false;
+firstNumEntered = false;
+secondNumEntered = false;
+
 function main() {
-  currentNums = [];
-  addActive = false;
-  subtractActive = false;
-  divideActive = false;
-  multiplyActive = false;
-
-  mathEnabled = false;
-
   const numbers = document.querySelectorAll(".number");
-
-  let num1;
-  let num2;
 
   numbers.forEach((number) => {
     number.addEventListener("click", () => {
@@ -30,6 +25,11 @@ function main() {
 
   const clear = document.getElementById("clear");
   clear.addEventListener("click", () => {
+    activeNum = 0;
+    symbol = "";
+    mathEnabled = false;
+    firstNumEntered = false;
+    secondNumEntered = false;
     eraseScreen();
     eraseFormulaScreen();
   });
@@ -38,60 +38,85 @@ function main() {
   equal.addEventListener("click", () => {
     const formulaScreen = document.getElementById("formula-screen");
     // nothing has been inputted in yet
-    if ((formulaScreen.textContent = "")) {
+    if (formulaScreen.textContent == "") {
       return;
     }
 
-    // else there is something already in the formula
-    num2 = Number(getScreenInput());
-    updateScreen(num1 + num2);
+    // something is ready in the formula screen and we have a input ready already
+    if (secondNumEntered) {
+      // else there is something already in the formula
+      outputResult();
+    }
 
     // need to know if there's an operation
   });
 
   const addition = document.getElementById("add");
   addition.addEventListener("click", () => {
-    // clear screen
+    // store the number on screen and set global var symbol
+    if (!secondNumEntered) {
+      activeNum = Number(getScreenText());
+      symbol = "+";
+    }
 
-    // store the number that was in it
-    num1 = Number(document.getElementById("screen").textContent);
-
-    // update formula screen
-    const formulaScreen = document.getElementById("formula-screen");
-    formulaScreen.textContent = num1 + " +";
+    updateFormulaScreen(`${activeNum}  ${symbol}`);
+    // condition to replace previous input
     mathEnabled = true;
+
+    // new number already entered in screen
+    if (secondNumEntered) {
+      outputResult();
+      symbol = "+";
+      // active num is updated from outputResult()
+      updateFormulaScreen(`${activeNum} ${symbol}`);
+      secondNumEntered = false;
+    }
+  });
+
+  function doubleSymbol() {
+    updateFormulaScreen(`${activeNum}  ${symbol}`);
+  }
+
+  const subtraction = document.getElementById("subtract");
+  subtraction.addEventListener("click", () => {
+    if (!secondNumEntered) {
+      activeNum = Number(getScreenText());
+      symbol = "-";
+    }
+
+    updateFormulaScreen(`${activeNum}  ${symbol}`);
+    mathEnabled = true;
+
+    //
+    if (secondNumEntered) {
+      // else there is something already in the formula
+      outputResult();
+      symbol = "-";
+      updateFormulaScreen(`${activeNum} ${symbol}`);
+      secondNumEntered = false;
+    }
+  });
+
+  // change the number to negative or positive only if its already entered
+  const negative = document.getElementById("negative");
+  negative.addEventListener("click", () => {
+    currentNumber = getScreenText();
+
+    if (currentNumber >= 0) {
+      updateScreen(`-${Math.abs(currentNumber)}`);
+    } else {
+      updateScreen(Math.abs(currentNumber));
+    }
   });
 }
 
-const add = (num1, num2) => num1 + num2;
-const subtract = (num1, num2) => num1 - num2;
-const multiply = (num1, num2) => num1 * num2;
-const divide = (num1, num2) => num1 / num2;
-
-// takes  the numbers and does the math
-function math(num1, num2, mathSign) {
-  if (checkNumber(num1) || checkNumber(num2)) {
-    console.log("Not numbers");
-    return;
-  }
-  num1 = Number(num1);
-  num2 = Number(num2);
-
-  switch (mathSign) {
-    case "+":
-      outcome = add(num1, num2);
-      break;
-    case "-":
-      outcome = subtract(num1, num2);
-      break;
-    case "*":
-      outcome = multiply(num1, num2);
-      break;
-    case "/":
-      outcome = divide(num1, num2);
-  }
-
-  console.log(outcome);
+function outputResult() {
+  secondNumEntered = false;
+  newNum = Number(getScreenText());
+  result = compute(symbol, activeNum, newNum);
+  updateScreen(result);
+  updateFormulaScreen(`${activeNum} ${symbol} ${newNum} =`);
+  activeNum = result;
 }
 
 // returns false if number, true if not a number
@@ -109,34 +134,51 @@ function eraseFormulaScreen() {
   formulaScreen.textContent = "";
 }
 
-// adds to the string
-function inputNumber(num) {
-  const screen = document.getElementById("screen");
-
-  if (screen.textContent == "0") {
-    screen.textContent = num;
-    return;
-  }
-
-  if (mathEnabled) {
-    mathEnabled = false;
-    screen.textContent = num;
-    return;
-  }
-
-  if (screen.textContent.length < 20) {
-    screen.textContent += num;
-  }
-}
-
-function getScreenInput() {
+function getScreenText() {
   const screen = document.getElementById("screen");
   return screen.textContent;
+}
+
+function getFormulaScreenText() {
+  const formulaScreen = document.getElementById("formula-screen");
+  return formulaScreen.textContent;
 }
 
 function updateScreen(num) {
   const screen = document.getElementById("screen");
   screen.textContent = num;
+}
+
+function updateFormulaScreen(formula) {
+  const formulaScreen = document.getElementById("formula-screen");
+  formulaScreen.textContent = formula;
+}
+
+// adds to the string
+function inputNumber(num) {
+  const screen = document.getElementById("screen");
+
+  if (getScreenText() == "-0") {
+    screen.textContent = `-${num}`;
+    firstNumEntered = true;
+    return;
+  } else if (screen.textContent == "0") {
+    screen.textContent = num;
+    firstNumEntered = true;
+    return;
+  }
+
+  if (mathEnabled) {
+    // need condition to replace previous input
+    mathEnabled = false;
+    secondNumEntered = true;
+    screen.textContent = num;
+    return;
+  }
+
+  if (screen.textContent.length < 10) {
+    screen.textContent += num;
+  }
 }
 
 function inputDecimal() {
@@ -146,5 +188,31 @@ function inputDecimal() {
     screen.textContent += ".";
   }
 }
+
+// returns number based on operation given
+function compute(symbol, num1, num2) {
+  console.log(`The symbol in compute is: ${symbol}`);
+  switch (symbol) {
+    case "+":
+      outcome = add(num1, num2);
+      break;
+    case "-":
+      outcome = subtract(num1, num2);
+      console.log(outcome);
+      break;
+    case "*":
+      outcome = multiply(num1, num2);
+      break;
+    case "/":
+      outcome = divide(num1, num2);
+  }
+
+  return outcome;
+}
+
+const add = (activeNum, newNum) => activeNum + newNum;
+const subtract = (activeNum, newNum) => activeNum - newNum;
+const multiply = (activeNum, newNum) => activeNum * newNum;
+const divide = (activeNum, newNum) => activeNum / newNum;
 
 main();
