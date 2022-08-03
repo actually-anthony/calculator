@@ -9,35 +9,44 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div id="formula-screen"></div>
-    <div id="screen">0</div>
+    <div id="screen">
+      <div id="formula-screen"></div>
+      <div id="input-screen"></div>
+    </div>
     <div id="buttons">
       <div id="number-buttons">
+        <div class="row">
+          <div id="clear" class="action">clr</div>
+          <div id="negative" class="action">+/-</div>
+          <div id="percentage" class="action">%</div>
+          <div id="division" class="action">÷</div>
+        </div>
         <div class="row">
           <div id="7" class="number">7</div>
           <div id="8" class="number">8</div>
           <div id="9" class="number">9</div>
+          <div id="multiple" class="action">×</div>
         </div>
         <div class="row">
           <div id="4" class="number">4</div>
           <div id="5" class="number">5</div>
           <div id="6" class="number">6</div>
+          <div id="subtract" class="action">-</div>
         </div>
         <div class="row">
-          <div id="0" class="number">0</div>
           <div id="1" class="number">1</div>
           <div id="2" class="number">2</div>
           <div id="3" class="number">3</div>
+          <div id="add" class="action">+</div>
+        </div>
+        <div class="row">
+          <div id="zero" class="number">0</div>
+          <div id="decimal" class="action">.</div>
+          <div id="equal" class="action">=</div>
         </div>
       </div>
 
-      <div id="function-buttons">
-        <div id="decimal" class="one">.</div>
-        <div id="clear" class="one">clr</div>
-        <div id="add" class="one">+</div>
-        <div id="subtract" class="one">-</div>
-        <div id="equal" class="one">=</div>
-      </div>
+      <div id="function-buttons"></div>
     </div>
   </body>
 </html>
