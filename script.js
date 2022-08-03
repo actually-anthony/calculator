@@ -14,7 +14,7 @@ function main() {
   numbers.forEach((number) => {
     number.addEventListener("click", () => {
       //give each number class a num id '1', '2', '3'
-      inputNumber(number.id);
+      inputNumber(number.textContent);
     });
   });
 
@@ -102,20 +102,81 @@ function main() {
   negative.addEventListener("click", () => {
     currentNumber = getScreenText();
 
-    if (currentNumber >= 0) {
+    if (currentNumber == "0") {
+      return;
+    }
+
+    if (currentNumber > 0) {
       updateScreen(`-${Math.abs(currentNumber)}`);
     } else {
       updateScreen(Math.abs(currentNumber));
     }
   });
+
+  const division = document.getElementById("division");
+  division.addEventListener("click", () => {
+    if (!secondNumEntered) {
+      activeNum = Number(getScreenText());
+      symbol = "/";
+    }
+
+    updateFormulaScreen(`${activeNum}  ÷`);
+    // condition to replace previous input
+    mathEnabled = true;
+
+    // new number already entered in screen
+    if (secondNumEntered) {
+      outputResult();
+      symbol = "/";
+      // active num is updated from outputResult()
+      updateFormulaScreen(`${activeNum} ÷`);
+      secondNumEntered = false;
+    }
+  });
+
+  const multiple = document.getElementById("multiple");
+  multiple.addEventListener("click", () => {
+    if (!secondNumEntered) {
+      activeNum = Number(getScreenText());
+      symbol = "*";
+    }
+
+    updateFormulaScreen(`${activeNum}  ×`);
+    // condition to replace previous input
+    mathEnabled = true;
+
+    // new number already entered in screen
+    if (secondNumEntered) {
+      outputResult();
+      symbol = "*";
+      // active num is updated from outputResult()
+      updateFormulaScreen(`${activeNum} ×`);
+      secondNumEntered = false;
+    }
+  });
+
+  const percentage = document.getElementById("percentage");
+  percentage.addEventListener("click", () => {
+    updateScreen(getScreenText() / 100);
+  });
 }
 
 function outputResult() {
   secondNumEntered = false;
+  firstNumEntered = false;
   newNum = Number(getScreenText());
   result = compute(symbol, activeNum, newNum);
   updateScreen(result);
-  updateFormulaScreen(`${activeNum} ${symbol} ${newNum} =`);
+
+  if (symbol == "*") {
+    tempSymbol = "×";
+  } else if (symbol == "/") {
+    tempSymbol = "÷";
+  } else {
+    tempSymbol = symbol;
+  }
+
+  updateFormulaScreen(`${activeNum} ${tempSymbol} ${newNum} =`);
   activeNum = result;
 }
 
@@ -125,7 +186,7 @@ const checkNumber = (num) => !Number(num) && num != 0;
 //TODO: erase the screen and saves the number
 // done after pressing a function
 function eraseScreen() {
-  const screen = document.getElementById("screen");
+  const screen = document.getElementById("input-screen");
   screen.textContent = "0";
 }
 
@@ -135,7 +196,7 @@ function eraseFormulaScreen() {
 }
 
 function getScreenText() {
-  const screen = document.getElementById("screen");
+  const screen = document.getElementById("input-screen");
   return screen.textContent;
 }
 
@@ -145,7 +206,7 @@ function getFormulaScreenText() {
 }
 
 function updateScreen(num) {
-  const screen = document.getElementById("screen");
+  const screen = document.getElementById("input-screen");
   screen.textContent = num;
 }
 
@@ -156,13 +217,18 @@ function updateFormulaScreen(formula) {
 
 // adds to the string
 function inputNumber(num) {
-  const screen = document.getElementById("screen");
+  const screen = document.getElementById("input-screen");
 
-  if (getScreenText() == "-0") {
-    screen.textContent = `-${num}`;
-    firstNumEntered = true;
-    return;
-  } else if (screen.textContent == "0") {
+  if (!firstNumEntered) {
+    if (getScreenText() == "-0") {
+      screen.textContent = `-${num}`;
+      firstNumEntered = true;
+      return;
+    } else if (screen.textContent == "0") {
+      screen.textContent = num;
+      firstNumEntered = true;
+      return;
+    }
     screen.textContent = num;
     firstNumEntered = true;
     return;
@@ -182,7 +248,7 @@ function inputNumber(num) {
 }
 
 function inputDecimal() {
-  const screen = document.getElementById("screen");
+  const screen = document.getElementById("input-screen");
 
   if (screen.textContent.length > 0 && !screen.textContent.includes(".")) {
     screen.textContent += ".";
@@ -214,5 +280,6 @@ const add = (activeNum, newNum) => activeNum + newNum;
 const subtract = (activeNum, newNum) => activeNum - newNum;
 const multiply = (activeNum, newNum) => activeNum * newNum;
 const divide = (activeNum, newNum) => activeNum / newNum;
+const percentage = (activeNum) => activeNum / 100;
 
 main();
